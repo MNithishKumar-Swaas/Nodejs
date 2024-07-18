@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Details Form</title>
+  <style>
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Student Details Form</h1>
+  <form id="studentForm">
+    <label for="rollNumber">Roll Number:</label><br>
+    <input type="text" id="rollNumber" name="rollNumber" pattern="[a-zA-Z]{2}\d{3}" required>
+    <span class="error" id="rollNumberError"></span><br><br>
+    
+    <label for="name">Name (Alphabets and spaces only):</label><br>
+    <input type="text" id="name" name="name" pattern="[A-Za-z\s]+" required>
+    <span class="error" id="nameError"></span><br><br>
+    
+    <label for="department">Department:</label><br>
+    <input type="text" id="department" name="department" required><br><br>
+    
+    <label for="dob">Date of Birth (DD-MM-YYYY):</label><br>
+    <input type="text" id="dob" name="dob" pattern="\d{2}-\d{2}-\d{4}" required>
+    <span class="error" id="dobError"></span><br><br>
+    
+    <label for="mobileNumber">Mobile Number:</label><br>
+    <select id="countryCode" name="countryCode">
+      <option value="+1">+1 (USA)</option>
+      <option value="+91">+91 (India)</option>
+      <option value="+44">+44 (UK)</option>
+
+    </select>
+    <input type="text" id="mobileNumber" name="mobileNumber" pattern="\d{10}" required>
+    <span class="error" id="mobileNumberError"></span><br><br>
+    
+    <label for="email">Email ID:</label><br>
+    <input type="email" id="email" name="email" required>
+    <span class="error" id="emailError"></span><br><br>
+    
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="studentDetails" style="display: none;">
+    <h2>Student Details</h2>
+    <p><strong>Roll Number:</strong> <span id="displayRollNumber"></span></p>
+    <p><strong>Name:</strong> <span id="displayName"></span></p>
+    <p><strong>Department:</strong> <span id="displayDepartment"></span></p>
+    <p><strong>Date of Birth:</strong> <span id="displayDob"></span></p>
+    <p><strong>Mobile Number:</strong> <span id="displayMobileNumber"></span></p>
+    <p><strong>Email ID:</strong> <span id="displayEmail"></span></p>
+  </div>
+
+  <script>
+    document.getElementById('studentForm').addEventListener('submit', function(event) {
+      event.preventDefault(); 
+      
+      let rollNumber = document.getElementById('rollNumber').value.trim();
+      let name = document.getElementById('name').value.trim();
+      let department = document.getElementById('department').value.trim();
+      let dob = document.getElementById('dob').value.trim();
+      let countryCode = document.getElementById('countryCode').value.trim();
+      let mobileNumber = document.getElementById('mobileNumber').value.trim();
+      let email = document.getElementById('email').value.trim();
+      
+      const rollNumberRegex = /^[a-zA-Z]{2}\d{3}$/;
+      const nameRegex = /^[A-Za-z\s]+$/;
+      const dobRegex = /^\d{2}-\d{2}-\d{4}$/;
+      const mobileRegex = /^\d{10}$/;
+      const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+      
+      let isValid = true;
+
+      if (!rollNumberRegex.test(rollNumber)) {
+        document.getElementById('rollNumberError').textContent = "Format is incorrect";
+        isValid = false;
+      } else {
+        document.getElementById('rollNumberError').textContent = "";
+      }
+
+      if (!nameRegex.test(name)) {
+        document.getElementById('nameError').textContent = "Name should only contain alphabets and spaces";
+        isValid = false;
+      } else {
+        document.getElementById('nameError').textContent = "";
+      }
+
+      if (!dobRegex.test(dob)) {
+        document.getElementById('dobError').textContent = "Incorrect date format (DD-MM-YYYY)";
+        isValid = false;
+      } else {
+        document.getElementById('dobError').textContent = "";
+      }
+
+      if (!mobileRegex.test(mobileNumber)) {
+        document.getElementById('mobileNumberError').textContent = "Enter a correct 10-digit number";
+        isValid = false;
+      } else {
+        document.getElementById('mobileNumberError').textContent = "";
+      }
+
+      if (!emailRegex.test(email)) {
+        document.getElementById('emailError').textContent = "Enter a valid email address";
+        isValid = false;
+      } else {
+        document.getElementById('emailError').textContent = "";
+      }
+
+      if (isValid) {
+        let fullPhoneNumber = countryCode + mobileNumber;
+
+        document.getElementById('displayRollNumber').textContent = rollNumber;
+        document.getElementById('displayName').textContent = name;
+        document.getElementById('displayDepartment').textContent = department;
+        document.getElementById('displayDob').textContent = dob;
+        document.getElementById('displayMobileNumber').textContent = fullPhoneNumber;
+        document.getElementById('displayEmail').textContent = email;
+        document.getElementById('studentDetails').style.display = "block";
+        document.getElementById('studentForm').reset(); 
+      }
+    });
+  </script>
+</body>
+</html>
