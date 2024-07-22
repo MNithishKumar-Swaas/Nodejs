@@ -1,3 +1,4 @@
+const fs = require('fs');
 const readline = require('readline');
 
 const rl = readline.createInterface({
@@ -5,112 +6,125 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
+const path = 'todo.json';
 let tasks = [];
+
+// Load tasks from todo.json if it exists
+try {
+    const data = fs.readFileSync(path, 'utf8');
+    tasks = JSON.parse(data);
+    console.log('Loaded existing tasks.');
+} catch (error) {
+    // If the file does not exist or is empty
+    console.log('No existing tasks found.');
+}
+
+function saveTasks() {
+    fs.writeFileSync(path, JSON.stringify(tasks, null, 2), 'utf8');
+}
 
 function addTask(task) {
     tasks.push({ task, completed: false });
+    saveTasks();
+    console.log(`Task "${task}" added.`);
+    promptTask(); // Continue prompting after adding task
 }
 
 function displayTasks() {
-    console.log("Today Activities List:");
+    console.log("Today's Activities List:");
     tasks.forEach((task, index) => {
         console.log(`${index + 1}. ${task.task} [${task.completed ? 'Completed' : 'Not Completed'}]`);
     });
+    promptTask(); // Continue prompting after displaying tasks
 }
 
 function markTaskAsCompleted(index) {
     if (index >= 0 && index < tasks.length) {
         tasks[index].completed = true;
+        saveTasks();
         console.log(`Task "${tasks[index].task}" marked as completed.`);
     } else {
         console.log("Invalid task number");
     }
+    promptTask(); // Continue prompting after marking task as completed or invalid task number
 }
 
 function updateTask(index, newTask) {
     if (index >= 0 && index < tasks.length) {
-        console.log(`Task "${tasks[index].task}" updated to "${newTask}".`);
         tasks[index].task = newTask;
+        saveTasks();
+        console.log(`Task updated to "${newTask}".`);
     } else {
         console.log("Invalid task number");
     }
+    promptTask(); // Continue prompting after updating task or invalid task number
 }
 
 function deleteTask(index) {
     if (index >= 0 && index < tasks.length) {
-        console.log(`Task "${tasks[index].task}" deleted.`);
+        const deletedTask = tasks[index].task;
         tasks.splice(index, 1);
+        saveTasks();
+        console.log(`Task "${deletedTask}" deleted.`);
     } else {
         console.log("Invalid task number");
     }
+    promptTask(); // Continue prompting after deleting task or invalid task number
 }
 
 function promptTask() {
     rl.question('Enter a command (add, complete, update, delete, view, exit): ', (command) => {
-        if (command === 'exit') {
-            rl.close();
-            return;
-        }
-
         switch (command) {
+            case 'exit':
+                rl.close();
+                break;
+
             case 'add':
                 rl.question('Enter a task: ', (task) => {
                     addTask(task);
-                    promptTask();
                 });
                 break;
 
             case 'complete':
                 rl.question('Enter task number to mark as completed: ', (num) => {
                     const index = parseInt(num) - 1;
-                    if (index >= 0 && index < tasks.length) {
-                        markTaskAsCompleted(index);
-                    } else {
-                        console.log("Invalid task number");
-                    }
-                    promptTask();
+                    markTaskAsCompleted(index);
                 });
                 break;
 
             case 'update':
                 rl.question('Enter task number to update: ', (num) => {
                     const index = parseInt(num) - 1;
-                    if (index >= 0 && index < tasks.length) {
-                        rl.question('Enter new task description: ', (newTask) => {
-                            updateTask(index, newTask);
-                            promptTask();
-                        });
-                    } else {
-                        console.log("Invalid task number");
-                        promptTask();
-                    }
+                    rl.question('Enter new task description: ', (newTask) => {
+                        updateTask(index, newTask);
+                    });
                 });
                 break;
 
             case 'delete':
                 rl.question('Enter task number to delete: ', (num) => {
                     const index = parseInt(num) - 1;
-                    if (index >= 0 && index < tasks.length) {
-                        deleteTask(index);
-                    } else {
-                        console.log("Invalid task number");
-                    }
-                    promptTask();
+                    deleteTask(index);
                 });
                 break;
 
             case 'view':
                 displayTasks();
-                promptTask();
                 break;
 
             default:
                 console.log('Invalid command');
-                promptTask();
+                promptTask(); // Continue prompting after invalid command
                 break;
         }
     });
 }
 
-// Start the task prompt loop
+// start the prompt 
 promptTask();
+
+// Handle 
+rl.on('close', () => {
+    console.log('Exiting ToDo list application.');
+    process.exit(0);
+});
