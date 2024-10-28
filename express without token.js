@@ -6,7 +6,7 @@ app.use(express.json())
 connection = mysql.createConnection({
     host:'localhost',
     user: 'root',
-    password: 'swaas@123',
+    password: '',
     database: 'k'
 });
 
